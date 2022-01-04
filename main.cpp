@@ -1,11 +1,11 @@
 #include <iostream>
-#include "FileLoader.h"
+#include "DataProcesser.h"
 
 int main(int argc, char* argv[])
 {
-    FileLoader loader("D:\\Github\\cautious-octo-barnacle\\resources\\network.mid");
-    loader.OpenFile();
-    loader.ReadLine();
+    DataProcesser processer;
+    processer.init("D:\\Github\\cautious-octo-barnacle\\resources\\network.mid");
+    processer.mapData();
 
     return 0;
 }

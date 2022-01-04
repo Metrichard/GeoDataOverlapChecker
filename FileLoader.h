@@ -13,7 +13,7 @@ enum LOADING_ERRORS
 class FileLoader
 {
     public:
-        FileLoader(std::string filePath) { path = filePath; hasLoadedFile = false; }
+        FileLoader(const std::string filePath) { path = filePath; hasLoadedFile = false; }
         void OpenFile();
         void ReadLine();
         ~FileLoader(){ reader.close(); }
