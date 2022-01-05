@@ -3,11 +3,13 @@
 
 #include <string>
 #include <fstream>
+#include <vector>
 
 enum LOADING_ERRORS
 {
     NO_LOADED_FILE = 0,
-    WRONG_PATH = 1
+    WRONG_PATH = 1,
+    END_OF_FILE = 100
 };
 
 class FileLoader
@@ -15,8 +17,9 @@ class FileLoader
     public:
         FileLoader(const std::string filePath) { path = filePath; hasLoadedFile = false; }
         void OpenFile();
-        void ReadLine();
+        std::vector<std::string> GetAllLinesFromFile();
         ~FileLoader(){ reader.close(); }
+
     private:
         void* file;
         std::ifstream reader;

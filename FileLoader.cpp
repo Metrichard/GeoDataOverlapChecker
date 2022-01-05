@@ -1,6 +1,7 @@
 #include "FileLoader.h"
 
 #include <iostream>
+#include <algorithm>
 
 void FileLoader::OpenFile()
 {
@@ -14,17 +15,19 @@ void FileLoader::OpenFile()
     hasLoadedFile = true;
 }
 
-void FileLoader::ReadLine()
+std::vector<std::string> FileLoader::GetAllLinesFromFile()
 {
     if(!hasLoadedFile)
     {
         std::cout << "There are no files loaded\n";
         throw LOADING_ERRORS::NO_LOADED_FILE;
     }
-
+    std::vector<std::string> lines;
     std::string line;
     while(getline(reader, line))
     {
-        std::cout << line << std::endl;
+        line.erase(std::remove(line.begin(), line.end(), '\"'), line.end());
+        lines.push_back(line);
     }
+    return lines;
 }
