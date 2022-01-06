@@ -13,9 +13,51 @@ void DataProcesser::init(const std::string path)
     }
 }
 
+void DataProcesser::printFoundDuplicates()
+{
+    for (int i = 0; i < duplicates.size(); ++i)
+    {
+        char scheme;
+        switch (duplicates[i].scheme) {
+            case SCHEME::EVEN: scheme = 'E';
+            case SCHEME::ODD: scheme = 'O';
+            default:
+                scheme = 'M';
+        }
+        std::cout << duplicates[i].streetName << " "
+                  << duplicates[i].streetType << ": "
+                  << scheme << " "
+                  << duplicates[i].from << " "
+                  << duplicates[i].to << std::endl;
+    }
+}
+
 void DataProcesser::searchForDuplicates()
 {
-    
+    searchForDuplicates(odds);
+    searchForDuplicates(evens);
+}
+
+void DataProcesser::searchForDuplicates(const std::vector<StreetSegment> &list)
+{
+    for(int i = 0; i < list.size(); i++)
+    {
+        for (int j = 0; j < list.size(); ++j) {
+            if(i == j) continue;
+            if(list[i].to >= list[j].from && list[i].from <= list[j].to && !contains(duplicates, list[j]))
+            {
+                duplicates.push_back(list[j]);
+            }
+        }
+    }
+}
+
+bool DataProcesser::contains(const std::vector<StreetSegment> &list, const StreetSegment &instance)
+{
+    for(int i = 0; i < list.size(); i++)
+        if(list[i].id == instance.id)
+            return true;
+    return false;
 }
 
 void DataProcesser::mapData()
@@ -28,6 +70,7 @@ void DataProcesser::mapData()
 
 void DataProcesser::ExtractDataFromLine(std::string line)
 {
+    static int id = 100;
     StreetSegment segment;
     auto lineArray = splitLine(line, ",");
     segment.streetName = lineArray[16];
@@ -38,7 +81,7 @@ void DataProcesser::ExtractDataFromLine(std::string line)
     {
         if(lineArray[20] != "M")
             segment.scheme = lineArray[20] == "O" ? SCHEME::ODD : SCHEME::EVEN;
-
+        segment.id = id++;
         segment.from = atoi(lineArray[21].c_str());
         segment.to = atoi(lineArray[22].c_str());
         if(segment.from > 0 && segment.to > 0)
@@ -49,6 +92,7 @@ void DataProcesser::ExtractDataFromLine(std::string line)
     {
         if(lineArray[23] != "M")
             segment.scheme = lineArray[23] == "0" ? SCHEME::ODD : SCHEME::EVEN;
+        segment.id = id++;
         segment.from = atoi(lineArray[24].c_str());
         segment.to = atoi(lineArray[25].c_str());
         if(segment.from > 0 && segment.to > 0)
