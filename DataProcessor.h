@@ -35,7 +35,7 @@ class DataProcessor
         void ExtractDataFromLine(std::string line);
         std::vector<std::string> splitLine(const std::string &line, const std::string &delimiter) const;
         void addToCorrespondingList(const StreetSegment &segment);
-        void searchForDuplicates(const std::vector<StreetSegment> &list);
+        void searchForDuplicatesInSubsection(const std::vector<StreetSegment> &list);
         bool contains(const std::vector<StreetSegment> &list, const StreetSegment &instance);
         void CheckAndAdd(const std::vector<std::string> &lineArray, int &id, StreetSegment &segment, int startingIndex);
 

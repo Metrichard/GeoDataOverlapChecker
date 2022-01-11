@@ -34,11 +34,11 @@ void DataProcessor::printFoundDuplicates()
 
 void DataProcessor::searchForDuplicates()
 {
-    searchForDuplicates(odds);
-    searchForDuplicates(evens);
+    searchForDuplicatesInSubsection(odds);
+    searchForDuplicatesInSubsection(evens);
 }
 
-void DataProcessor::searchForDuplicates(const std::vector<StreetSegment> &list)
+void DataProcessor::searchForDuplicatesInSubsection(const std::vector<StreetSegment> &list)
 {
     for(int i = 0; i < list.size(); i++)
     {
@@ -62,7 +62,7 @@ bool DataProcessor::contains(const std::vector<StreetSegment> &list, const Stree
 
 void DataProcessor::mapData()
 {
-    auto lines = fileLoader->GetAllLinesFromFile();
+    std::vector<std::string> lines = fileLoader->GetAllLinesFromFile();
     for (std::string line : lines) {
         ExtractDataFromLine(line);
     }
@@ -75,8 +75,7 @@ void DataProcessor::ExtractDataFromLine(std::string line)
     auto lineArray = splitLine(line, ",");
     segment.streetName = lineArray[16];
     segment.streetType = lineArray[17];
-    if(segment.streetName == "" || segment.streetType == "")
-        return;
+    if(segment.streetName == "" || segment.streetType == "") return;
     if(lineArray[20] != "")
     {
         CheckAndAdd(lineArray, ++id, segment, 20);
