@@ -1,5 +1,6 @@
 #include <iostream>
 #include "DataProcessor.h"
+#include <chrono>
 
 void DataProcessor::init(const std::string path)
 {
@@ -39,8 +40,11 @@ void DataProcessor::printFoundDuplicates()
 
 void DataProcessor::searchForDuplicates()
 {
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     searchForDuplicatesInSubsection(odds);
     searchForDuplicatesInSubsection(evens);
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    std::cout << "\t\tTask Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " ms" << std::endl;
 }
 
 void DataProcessor::searchForDuplicatesInSubsection(const std::vector<StreetSegment> &list)
