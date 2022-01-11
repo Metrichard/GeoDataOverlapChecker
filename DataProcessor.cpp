@@ -19,12 +19,12 @@ void DataProcessor::printFoundDuplicates()
     {
         char scheme;
         switch (duplicates[i].scheme) {
-            case SCHEME::EVEN: scheme = 'E';
-            case SCHEME::ODD: scheme = 'O';
+            case SCHEME::EVEN: scheme = 'E'; break;
+            case SCHEME::ODD: scheme = 'O'; break;
             default:
                 scheme = 'M';
         }
-        std::cout << duplicates[i].streetName << " "
+        std::cout << i << " : " << duplicates[i].streetName << " "
                   << duplicates[i].streetType << ": "
                   << scheme << " "
                   << duplicates[i].from << " "
@@ -44,9 +44,10 @@ void DataProcessor::searchForDuplicatesInSubsection(const std::vector<StreetSegm
     {
         for (int j = 0; j < list.size(); ++j) {
             if(i == j) continue;
-            if(list[i].to >= list[j].from && list[i].from <= list[j].to && !contains(duplicates, list[j]))
+            if(list[i].streetName != list[j].streetName || list[i].streetType != list[j].streetType) continue;
+            if(list[i].to >= list[j].from && list[i].from <= list[j].to && !contains(duplicates, list[i]))
             {
-                duplicates.push_back(list[j]);
+                duplicates.push_back(list[i]);
             }
         }
     }
@@ -55,7 +56,7 @@ void DataProcessor::searchForDuplicatesInSubsection(const std::vector<StreetSegm
 bool DataProcessor::contains(const std::vector<StreetSegment> &list, const StreetSegment &instance)
 {
     for(int i = 0; i < list.size(); i++)
-        if(list[i].id == instance.id)
+        if(list[i] == instance)
             return true;
     return false;
 }
@@ -89,7 +90,7 @@ void DataProcessor::ExtractDataFromLine(std::string line)
 
 void DataProcessor::CheckAndAdd(const std::vector<std::string> &lineArray, int &id, StreetSegment &segment, int startingIndex) {
     if(lineArray[startingIndex] != "M")
-        segment.scheme = lineArray[startingIndex++] == "O" ? ODD : EVEN;
+        segment.scheme = lineArray[startingIndex++] == "0" ? ODD : EVEN;
     segment.id = id++;
     segment.from = atoi(lineArray[startingIndex++].c_str());
     segment.to = atoi(lineArray[startingIndex].c_str());

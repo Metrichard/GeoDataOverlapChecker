@@ -20,6 +20,17 @@ struct StreetSegment
     SCHEME scheme = SCHEME::MIXED;
     int from;
     int to;
+
+    bool operator==(const StreetSegment& other) const {
+        if(to == other.to && from == other.from && streetName == other.streetName && streetType == other.streetType){
+            return true;
+        }
+        return false;
+    }
+
+    bool operator!=(const StreetSegment& other) const {
+        return !(*this == other);
+    }
 };
 
 
