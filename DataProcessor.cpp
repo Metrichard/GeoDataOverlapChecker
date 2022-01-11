@@ -1,4 +1,3 @@
-#include <sstream>
 #include <iostream>
 #include "DataProcessor.h"
 
@@ -9,6 +8,12 @@ void DataProcessor::init(const std::string path)
         fileLoader->OpenFile();
     }catch(LOADING_ERRORS e)
     {
+        if(e == LOADING_ERRORS::WRONG_PATH) {
+            std::cout << "File on path [" << path << "] does not exist\n";
+        }
+        else {
+            std::cout << "Unhandled error";
+        }
         exit(EXIT_FAILURE);
     }
 }
@@ -24,7 +29,7 @@ void DataProcessor::printFoundDuplicates()
             default:
                 scheme = 'M';
         }
-        std::cout << i << " : " << duplicates[i].streetName << " "
+        std::cout << duplicates[i].streetName << " "
                   << duplicates[i].streetType << ": "
                   << scheme << " "
                   << duplicates[i].from << " "
@@ -43,8 +48,8 @@ void DataProcessor::searchForDuplicatesInSubsection(const std::vector<StreetSegm
     for(int i = 0; i < list.size(); i++)
     {
         for (int j = 0; j < list.size(); ++j) {
-            if(i == j) continue;
-            if(list[i].streetName != list[j].streetName || list[i].streetType != list[j].streetType) continue;
+            if(i == j || list[i].streetName != list[j].streetName || list[i].streetType != list[j].streetType) continue;
+
             if(list[i].to >= list[j].from && list[i].from <= list[j].to && !contains(duplicates, list[i]))
             {
                 duplicates.push_back(list[i]);
@@ -63,7 +68,22 @@ bool DataProcessor::contains(const std::vector<StreetSegment> &list, const Stree
 
 void DataProcessor::mapData()
 {
-    std::vector<std::string> lines = fileLoader->GetAllLinesFromFile();
+    std::vector<std::string> lines;
+    try {
+        if(fileLoader == nullptr)
+            throw MAPPING_ERROR::FILE_LOADER_NO_INIT;
+        lines = fileLoader->GetAllLinesFromFile();
+    }catch(LOADING_ERRORS e){
+        if(e == LOADING_ERRORS::NO_LOADED_FILE) {
+            std::cout << "There are no files loaded\n";
+        }
+        exit(EXIT_FAILURE);
+    }catch(MAPPING_ERROR e){
+        if(e == MAPPING_ERROR::FILE_LOADER_NO_INIT)
+            std::cout << "File loader failed to initialize\n";
+        exit(EXIT_FAILURE);
+    }
+
     for (std::string line : lines) {
         ExtractDataFromLine(line);
     }
@@ -71,7 +91,6 @@ void DataProcessor::mapData()
 
 void DataProcessor::ExtractDataFromLine(std::string line)
 {
-    static int id = 100;
     StreetSegment segment;
     auto lineArray = splitLine(line, ",");
     segment.streetName = lineArray[16];
@@ -79,19 +98,18 @@ void DataProcessor::ExtractDataFromLine(std::string line)
     if(segment.streetName == "" || segment.streetType == "") return;
     if(lineArray[20] != "")
     {
-        CheckAndAdd(lineArray, ++id, segment, 20);
+        CheckAndAdd(lineArray, segment, 20);
     }
     segment.scheme = SCHEME::MIXED;
     if(lineArray[23] != "")
     {
-        CheckAndAdd(lineArray, ++id, segment, 23);
+        CheckAndAdd(lineArray, segment, 23);
     }
 }
 
-void DataProcessor::CheckAndAdd(const std::vector<std::string> &lineArray, int &id, StreetSegment &segment, int startingIndex) {
+void DataProcessor::CheckAndAdd(const std::vector<std::string> &lineArray, StreetSegment &segment, int startingIndex) {
     if(lineArray[startingIndex] != "M")
         segment.scheme = lineArray[startingIndex++] == "0" ? ODD : EVEN;
-    segment.id = id++;
     segment.from = atoi(lineArray[startingIndex++].c_str());
     segment.to = atoi(lineArray[startingIndex].c_str());
     if(segment.from > 0 && segment.to > 0)
@@ -102,7 +120,7 @@ void DataProcessor::addToCorrespondingList(const StreetSegment &segment) {
     switch (segment.scheme) {
         case ODD : odds.push_back(segment); break;
         case EVEN : evens.push_back(segment); break;
-        case MIXED : mixed.push_back(segment); break;
+        case MIXED : odds.push_back(segment); evens.push_back(segment); break;
     }
 }
 

@@ -8,8 +8,7 @@
 enum LOADING_ERRORS
 {
     NO_LOADED_FILE = 0,
-    WRONG_PATH = 1,
-    END_OF_FILE = 100
+    WRONG_PATH = 1
 };
 
 class FileLoader
