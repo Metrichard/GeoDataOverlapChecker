@@ -15,28 +15,29 @@ enum SCHEME
 struct StreetSegment
 {
     int id;
-    std::string streetName; // 16
-    std::string streetType; // 17
-    SCHEME scheme = SCHEME::MIXED; // 20 - 23
-    int from;               // LEFT:21 | RIGHT:24
-    int to;                 // LEFT:22 | RIGHT:25
+    std::string streetName;
+    std::string streetType;
+    SCHEME scheme = SCHEME::MIXED;
+    int from;
+    int to;
 };
 
 
-class DataProcesser
+class DataProcessor
 {
     public:
         void init(const std::string path);
         void mapData();
         void searchForDuplicates();
         void printFoundDuplicates();
-        ~DataProcesser() { free(fileLoader); }
+        ~DataProcessor() { free(fileLoader); }
     private:
         void ExtractDataFromLine(std::string line);
         std::vector<std::string> splitLine(const std::string &line, const std::string &delimiter) const;
         void addToCorrespondingList(const StreetSegment &segment);
         void searchForDuplicates(const std::vector<StreetSegment> &list);
         bool contains(const std::vector<StreetSegment> &list, const StreetSegment &instance);
+        void CheckAndAdd(const std::vector<std::string> &lineArray, int &id, StreetSegment &segment, int startingIndex);
 
     private:
         FileLoader* fileLoader;

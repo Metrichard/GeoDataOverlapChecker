@@ -1,13 +1,17 @@
 #include <iostream>
-#include "DataProcesser.h"
+#include "DataProcessor.h"
 
 int main(int argc, char* argv[])
 {
-    DataProcesser processer;
-    processer.init("D:\\Github\\cautious-octo-barnacle\\resources\\network.mid");
-    processer.mapData();
-    processer.searchForDuplicates();
-    processer.printFoundDuplicates();
+    std::string filePath;
+    if(argc > 1) filePath = argv[1];
+    else std::getline(std::cin, filePath);
+
+    DataProcessor processor;
+    processor.init(filePath);
+    processor.mapData();
+    processor.searchForDuplicates();
+    processor.printFoundDuplicates();
 
     return 0;
 }

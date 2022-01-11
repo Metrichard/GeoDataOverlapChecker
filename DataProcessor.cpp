@@ -1,8 +1,8 @@
 #include <sstream>
 #include <iostream>
-#include "DataProcesser.h"
+#include "DataProcessor.h"
 
-void DataProcesser::init(const std::string path)
+void DataProcessor::init(const std::string path)
 {
     fileLoader = new FileLoader(path);
     try{
@@ -13,7 +13,7 @@ void DataProcesser::init(const std::string path)
     }
 }
 
-void DataProcesser::printFoundDuplicates()
+void DataProcessor::printFoundDuplicates()
 {
     for (int i = 0; i < duplicates.size(); ++i)
     {
@@ -32,13 +32,13 @@ void DataProcesser::printFoundDuplicates()
     }
 }
 
-void DataProcesser::searchForDuplicates()
+void DataProcessor::searchForDuplicates()
 {
     searchForDuplicates(odds);
     searchForDuplicates(evens);
 }
 
-void DataProcesser::searchForDuplicates(const std::vector<StreetSegment> &list)
+void DataProcessor::searchForDuplicates(const std::vector<StreetSegment> &list)
 {
     for(int i = 0; i < list.size(); i++)
     {
@@ -52,7 +52,7 @@ void DataProcesser::searchForDuplicates(const std::vector<StreetSegment> &list)
     }
 }
 
-bool DataProcesser::contains(const std::vector<StreetSegment> &list, const StreetSegment &instance)
+bool DataProcessor::contains(const std::vector<StreetSegment> &list, const StreetSegment &instance)
 {
     for(int i = 0; i < list.size(); i++)
         if(list[i].id == instance.id)
@@ -60,7 +60,7 @@ bool DataProcesser::contains(const std::vector<StreetSegment> &list, const Stree
     return false;
 }
 
-void DataProcesser::mapData()
+void DataProcessor::mapData()
 {
     auto lines = fileLoader->GetAllLinesFromFile();
     for (std::string line : lines) {
@@ -68,7 +68,7 @@ void DataProcesser::mapData()
     }
 }
 
-void DataProcesser::ExtractDataFromLine(std::string line)
+void DataProcessor::ExtractDataFromLine(std::string line)
 {
     static int id = 100;
     StreetSegment segment;
@@ -79,28 +79,26 @@ void DataProcesser::ExtractDataFromLine(std::string line)
         return;
     if(lineArray[20] != "")
     {
-        if(lineArray[20] != "M")
-            segment.scheme = lineArray[20] == "O" ? SCHEME::ODD : SCHEME::EVEN;
-        segment.id = id++;
-        segment.from = atoi(lineArray[21].c_str());
-        segment.to = atoi(lineArray[22].c_str());
-        if(segment.from > 0 && segment.to > 0)
-            addToCorrespondingList(segment);
+        CheckAndAdd(lineArray, ++id, segment, 20);
     }
     segment.scheme = SCHEME::MIXED;
     if(lineArray[23] != "")
     {
-        if(lineArray[23] != "M")
-            segment.scheme = lineArray[23] == "0" ? SCHEME::ODD : SCHEME::EVEN;
-        segment.id = id++;
-        segment.from = atoi(lineArray[24].c_str());
-        segment.to = atoi(lineArray[25].c_str());
-        if(segment.from > 0 && segment.to > 0)
-            addToCorrespondingList(segment);
+        CheckAndAdd(lineArray, ++id, segment, 23);
     }
 }
 
-void DataProcesser::addToCorrespondingList(const StreetSegment &segment) {
+void DataProcessor::CheckAndAdd(const std::vector<std::string> &lineArray, int &id, StreetSegment &segment, int startingIndex) {
+    if(lineArray[startingIndex] != "M")
+        segment.scheme = lineArray[startingIndex++] == "O" ? ODD : EVEN;
+    segment.id = id++;
+    segment.from = atoi(lineArray[startingIndex++].c_str());
+    segment.to = atoi(lineArray[startingIndex].c_str());
+    if(segment.from > 0 && segment.to > 0)
+        addToCorrespondingList(segment);
+}
+
+void DataProcessor::addToCorrespondingList(const StreetSegment &segment) {
     switch (segment.scheme) {
         case ODD : odds.push_back(segment); break;
         case EVEN : evens.push_back(segment); break;
@@ -108,7 +106,7 @@ void DataProcesser::addToCorrespondingList(const StreetSegment &segment) {
     }
 }
 
-std::vector<std::string> DataProcesser::splitLine(const std::string &line, const std::string &delimiter) const {
+std::vector<std::string> DataProcessor::splitLine(const std::string &line, const std::string &delimiter) const {
     int start = 0;
     int end = line.find(delimiter);
     std::vector<std::string> splitLine;
