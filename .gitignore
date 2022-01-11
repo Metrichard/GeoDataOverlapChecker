@@ -3,4 +3,4 @@ resources/
 cmake-build-debug/
 CMakeLists.txt
 *.out
-/idea
+.idea/
